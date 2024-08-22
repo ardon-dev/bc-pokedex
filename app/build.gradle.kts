@@ -1,8 +1,15 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.dagger.hilt)
+}
+
+val properties = Properties().apply {
+    load(FileInputStream(File(rootProject.rootDir, "local.properties")))
 }
 
 android {
@@ -23,7 +30,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL", properties.getProperty("api.url"))
+        }
         release {
+            buildConfigField("String", "BASE_URL", properties.getProperty("api.url"))
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -40,6 +51,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
