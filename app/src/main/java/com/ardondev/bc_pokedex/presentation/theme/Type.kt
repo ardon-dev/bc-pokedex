@@ -1,4 +1,4 @@
-package com.ardondev.bc_pokedex.ui.theme
+package com.ardondev.bc_pokedex.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

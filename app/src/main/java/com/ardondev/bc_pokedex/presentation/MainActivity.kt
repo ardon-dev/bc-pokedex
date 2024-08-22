@@ -1,4 +1,4 @@
-package com.ardondev.bc_pokedex
+package com.ardondev.bc_pokedex.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.ardondev.bc_pokedex.ui.theme.BCPokedexTheme
+import com.ardondev.bc_pokedex.presentation.theme.BCPokedexTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
