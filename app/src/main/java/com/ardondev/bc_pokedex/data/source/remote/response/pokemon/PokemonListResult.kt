@@ -12,8 +12,12 @@ data class PokemonListResult(
     val url: String?,
 ) {
 
-    fun getId(): String {
-        return url?.substringBefore("/")?.substringAfterLast("/") ?: "0"
+    fun getId(): String? {
+        url?.let {
+            val pattern = Regex(".*/pokemon/(\\d+)/")
+            return pattern.find(url)?.groupValues?.get(1)
+        }
+        return "0"
     }
 
 }

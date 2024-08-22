@@ -123,4 +123,7 @@ dependencies {
 
     //Paging (Compose)
     implementation(libs.androidx.paging.compose)
+
+    //Coil
+    implementation(libs.coil)
 }
