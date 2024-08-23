@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -42,6 +41,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.ardondev.bc_pokedex.R
 import com.ardondev.bc_pokedex.domain.model.pokemon.Pokemon
+import com.ardondev.bc_pokedex.presentation.components.LoadingView
 import com.ardondev.bc_pokedex.presentation.theme.Typography
 import com.ardondev.bc_pokedex.presentation.theme.navy
 import com.ardondev.bc_pokedex.presentation.theme.yellow
@@ -116,38 +116,48 @@ fun HomeSearchBar(
 
 @Composable
 fun HomePokemonList(pokemonPagingItems: LazyPagingItems<Pokemon>) {
+    pokemonPagingItems.apply {
+        when {
+            loadState.refresh is LoadState.Loading && pokemonPagingItems.itemCount == 0 -> {
+                LoadingView()
+            }
+
+            loadState.refresh is LoadState.NotLoading && pokemonPagingItems.itemCount == 0 -> {
+                val error = pokemonPagingItems.loadState.refresh as LoadState.Error
+                Text(text = error.error.localizedMessage)
+            }
+
+            loadState.hasError -> {
+                Text("Error")
+            }
+
+            else -> {
+                PokemonList(pokemonPagingItems)
+
+                if (pokemonPagingItems.loadState.append is LoadState.Loading) {
+                    LoadingView()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PokemonList(pokemonPagingItems: LazyPagingItems<Pokemon>) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 128.dp),
         contentPadding = PaddingValues(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(count = pokemonPagingItems.itemCount, key = { index ->
-            pokemonPagingItems[index]!!.id!!
-        }) { index ->
-            val pokemon = pokemonPagingItems[index]
-            PokemonItem(pokemon!!)
-        }
-
-        pokemonPagingItems.apply {
-            when {
-                loadState.refresh is LoadState.Loading -> {
-                    item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
-                }
-
-                loadState.refresh is LoadState.Error -> {
-                    val error = pokemonPagingItems.loadState.refresh as LoadState.Error
-                    item { Text(text = error.error.localizedMessage) }
-                }
-
-                loadState.append is LoadState.Loading -> {
-                    item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
-                }
-
-                loadState.append is LoadState.Error -> {
-                    val error = pokemonPagingItems.loadState.append as LoadState.Error
-                    item { Text(text = error.error.localizedMessage) }
-                }
+        items(
+            count = pokemonPagingItems.itemCount,
+            key = { index ->
+                pokemonPagingItems[index]!!.id!!
+            }
+        ) { index ->
+            pokemonPagingItems[index]?.let { pokemon ->
+                PokemonItem(pokemon)
             }
         }
     }

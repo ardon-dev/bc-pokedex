@@ -106,12 +106,6 @@ dependencies {
     //Navigation (Compose)
     implementation(libs.androidx.navigation.compose)
 
-    //Glide
-    implementation(libs.glide)
-    implementation(libs.glide.okhttp3.integration)
-    implementation(libs.glide.transformations)
-    ksp(libs.glide.ksp)
-
     //Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.moshi)
@@ -126,4 +120,6 @@ dependencies {
 
     //Coil
     implementation(libs.coil)
+    implementation(libs.coil.gif)
+
 }
