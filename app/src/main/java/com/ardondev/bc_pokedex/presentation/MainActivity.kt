@@ -27,9 +27,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.ardondev.bc_pokedex.R
 import com.ardondev.bc_pokedex.presentation.screens.detail.DetailScreen
 import com.ardondev.bc_pokedex.presentation.screens.home.HomeScreen
@@ -81,7 +83,14 @@ fun MainNavigation(
         }
 
         //Detail screen
-        composable(Routes.DetailScreen.route) {
+        composable(
+            route = Routes.DetailScreen.route,
+            arguments = listOf(
+                navArgument("pokemon_id") {
+                    type = NavType.IntType
+                }
+            )
+        ) {
             DetailScreen()
         }
 

@@ -20,8 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getPokemonListUseCase: GetPokemonListUseCase
-): ViewModel() {
+    private val getPokemonListUseCase: GetPokemonListUseCase,
+) : ViewModel() {
 
     /** Search query **/
 
@@ -55,7 +55,7 @@ class HomeViewModel @Inject constructor(
     private fun getFilteredPokemon(pokemonData: PagingData<Pokemon>): PagingData<Pokemon> {
         return pokemonData.filter {
             val name = it.name?.toLowerCase(Locale.current) ?: ""
-            (name.contains(query.toLowerCase(Locale.current)) || it.id.orEmpty() == query)
+            (name.contains(query.toLowerCase(Locale.current)) || it.id.toString() == query)
         }
     }
 

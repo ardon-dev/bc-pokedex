@@ -8,5 +8,7 @@ sealed class Routes(
 
     object HomeScreen: Routes("home")
 
-    object DetailScreen: Routes("detail")
+    object DetailScreen: Routes("detail/{pokemon_id}") {
+        fun createRoute(pokemonId: Int) = "detail/$pokemonId"
+    }
 }

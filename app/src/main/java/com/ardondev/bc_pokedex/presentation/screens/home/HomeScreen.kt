@@ -59,7 +59,7 @@ import com.ardondev.bc_pokedex.presentation.util.Routes
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    navController: NavController
+    navController: NavController,
 ) {
 
     val pokemonPagingItems = viewModel.pokemonListState.collectAsLazyPagingItems()
@@ -73,7 +73,7 @@ fun HomeScreen(
                 viewModel.getPokemonList()
             },
             onSelect = { pokemon ->
-                navController.navigate(Routes.DetailScreen.route)
+                navController.navigate(Routes.DetailScreen.createRoute(pokemon.id ?: -1))
             }
         )
     }
@@ -148,7 +148,7 @@ fun HomePokemonList(
     viewModel: HomeViewModel,
     pokemonPagingItems: LazyPagingItems<Pokemon>,
     onRetry: () -> Unit,
-    onSelect: (Pokemon) -> Unit
+    onSelect: (Pokemon) -> Unit,
 ) {
     pokemonPagingItems.apply {
 

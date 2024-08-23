@@ -26,6 +26,8 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,15 +38,38 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.ardondev.bc_pokedex.R
 import com.ardondev.bc_pokedex.domain.model.pokemon.Pokemon
+import com.ardondev.bc_pokedex.presentation.components.ErrorView
+import com.ardondev.bc_pokedex.presentation.components.LoadingView
 import com.ardondev.bc_pokedex.presentation.theme.blue
 import com.ardondev.bc_pokedex.presentation.theme.navy
+import com.ardondev.bc_pokedex.presentation.util.UiState
 
 @Preview
 @Composable
-fun DetailScreen() {
+fun DetailScreen(
+    pokemonId: Int? = null,
+    viewModel: DetailViewModel = hiltViewModel(),
+) {
+
+    val uiState by viewModel.uiState.collectAsState()
+    when (uiState) {
+        is UiState.Loading -> LoadingView()
+        is UiState.Success -> DetailContent()
+        is UiState.Error -> ErrorView(message = "") {
+
+        }
+    }
+}
+
+@Composable
+fun DetailContent() {
     Column(
         Modifier
             .fillMaxSize()
