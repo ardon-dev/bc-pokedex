@@ -4,6 +4,8 @@ package com.ardondev.bc_pokedex.presentation.screens.detail
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +19,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -45,52 +49,74 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.ardondev.bc_pokedex.R
 import com.ardondev.bc_pokedex.domain.model.pokemon.Pokemon
+import com.ardondev.bc_pokedex.domain.model.pokemon.Stat
 import com.ardondev.bc_pokedex.presentation.components.ErrorView
 import com.ardondev.bc_pokedex.presentation.components.LoadingView
 import com.ardondev.bc_pokedex.presentation.theme.blue
 import com.ardondev.bc_pokedex.presentation.theme.navy
 import com.ardondev.bc_pokedex.presentation.util.UiState
+import com.ardondev.bc_pokedex.presentation.util.getSprite
 
-@Preview
 @Composable
 fun DetailScreen(
-    pokemonId: Int? = null,
     viewModel: DetailViewModel = hiltViewModel(),
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
     when (uiState) {
         is UiState.Loading -> LoadingView()
-        is UiState.Success -> DetailContent()
-        is UiState.Error -> ErrorView(message = "") {
-
+        is UiState.Success -> {
+            val pokemon = (uiState as UiState.Success).data
+            DetailContent(pokemon)
+        }
+        is UiState.Error ->  {
+            val error = (uiState as UiState.Error).exception.message
+            ErrorView(error.orEmpty()) {
+                viewModel.getPokemonDetail()
+            }
         }
     }
 }
 
+@Preview
 @Composable
-fun DetailContent() {
+fun DetailContentPreview() {
+    val pokemon = Pokemon("a", "s", 5)
+    DetailContent(pokemon = pokemon)
+}
+
+@Composable
+fun DetailContent(
+    pokemon: Pokemon
+) {
+
+    val scrollState = rememberScrollState()
+
     Column(
         Modifier
             .fillMaxSize()
+            .verticalScroll(scrollState)
             .padding(
                 vertical = 16.dp,
                 horizontal = 24.dp
             )
     ) {
-        DetailHead()
+        DetailHead(pokemon)
         Spacer(Modifier.size(16.dp))
-        DetailPokemonProperties()
+        DetailPokemonProperties(
+            weight = pokemon.weight ?: 0,
+            height = pokemon.height ?: 0
+        )
         Spacer(Modifier.size(16.dp))
         DetailDescription()
         Spacer(Modifier.size(16.dp))
-        DetailStatistics()
+        DetailStatistics(pokemon.stats.orEmpty())
     }
 }
 
 @Composable
 fun DetailHead(
-    pokemon: Pokemon? = null,
+    pokemon: Pokemon
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -115,12 +141,12 @@ fun DetailHead(
         )
 
         AsyncImage(
-            model = pokemon?.getSprite(),
+            model = getSprite(pokemon.id!!),
             contentDescription = null,
             error = painterResource(R.drawable.ic_pokeball),
             placeholder = painterResource(R.drawable.ic_pokeball),
             modifier = Modifier
-                .size(150.dp)
+                .size(200.dp)
                 .constrainAs(sprite) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
@@ -144,7 +170,10 @@ fun DetailHead(
 }
 
 @Composable
-fun DetailPokemonProperties() {
+fun DetailPokemonProperties(
+    weight: Int,
+    height: Int
+) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = Color.White
@@ -154,13 +183,13 @@ fun DetailPokemonProperties() {
             modifier = Modifier
                 .height(IntrinsicSize.Min)
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(16.dp)
         ) {
             Box(Modifier.weight(1f)) {
                 DetailProperty(
                     resId = R.drawable.ic_weight,
                     label = stringResource(R.string.txt_weight),
-                    value = "110kg"
+                    value = (weight / 10).toString() + " Kg"
                 )
             }
             Divider(
@@ -172,7 +201,7 @@ fun DetailPokemonProperties() {
                 DetailProperty(
                     resId = R.drawable.ic_rule,
                     label = stringResource(R.string.txt_height),
-                    value = "1,71 m"
+                    value = (height.toFloat() / 10).toString() + " m"
                 )
             }
         }
@@ -199,13 +228,13 @@ fun DetailProperty(
         Column {
             Text(
                 text = value,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
                 color = navy
             )
             Text(
                 text = label,
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Light,
                 color = blue
             )
@@ -225,7 +254,9 @@ fun DetailDescription() {
 }
 
 @Composable
-fun DetailStatistics() {
+fun DetailStatistics(
+    stats: List<Stat>
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -238,20 +269,30 @@ fun DetailStatistics() {
             color = navy
         )
         Spacer(Modifier.size(16.dp))
-        StatisticBar(label = "HP", value = "100")
+        stats.forEach {
+            val name = when (it.id) {
+                1 -> "HP"
+                2 -> "Ataque"
+                3 -> "Defensa"
+                4 -> "Ataque especial"
+                5 -> "Defensa especial"
+                else -> "Velocidad"
+            }
+            StatisticBar(label = name, value = it.base!!)
+        }
     }
 }
 
 @Composable
 fun StatisticBar(
     label: String,
-    value: String,
+    value: Int,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier
-            .padding(bottom = 8.dp)
+            .padding(bottom = 16.dp)
             .fillMaxWidth()
     ) {
         //HP
@@ -265,16 +306,16 @@ fun StatisticBar(
         Spacer(Modifier.size(8.dp))
         //Bar
         LinearProgressIndicator(
-            progress = 0.5f,
+            progress = (value * 0.01).toFloat(),
             strokeCap = StrokeCap.Round,
             modifier = Modifier
-                .height(12.dp)
-                .weight(2f)
+                .height(14.dp)
+                .weight(1.5f)
         )
         Spacer(Modifier.size(8.dp))
         //Value
         Text(
-            text = value,
+            text = value.toString(),
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.ExtraBold,
             color = Color(0xFF404040),

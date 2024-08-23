@@ -20,7 +20,7 @@ class DetailViewModel @Inject constructor(
     private val getPokemonDetailUseCase: GetPokemonDetailUseCase,
 ) : ViewModel() {
 
-    private val pokemonId = savedStateHandle["pokemon_id"] ?: -1
+    val pokemonId = savedStateHandle["pokemon_id"] ?: -1
 
     /** Detail ui state **/
 
