@@ -41,6 +41,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -53,10 +54,12 @@ import com.ardondev.bc_pokedex.presentation.components.SearchLoadingView
 import com.ardondev.bc_pokedex.presentation.theme.Typography
 import com.ardondev.bc_pokedex.presentation.theme.navy
 import com.ardondev.bc_pokedex.presentation.theme.yellow
+import com.ardondev.bc_pokedex.presentation.util.Routes
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
+    navController: NavController
 ) {
 
     val pokemonPagingItems = viewModel.pokemonListState.collectAsLazyPagingItems()
@@ -68,6 +71,9 @@ fun HomeScreen(
             pokemonPagingItems = pokemonPagingItems,
             onRetry = {
                 viewModel.getPokemonList()
+            },
+            onSelect = { pokemon ->
+                navController.navigate(Routes.DetailScreen.route)
             }
         )
     }
@@ -142,6 +148,7 @@ fun HomePokemonList(
     viewModel: HomeViewModel,
     pokemonPagingItems: LazyPagingItems<Pokemon>,
     onRetry: () -> Unit,
+    onSelect: (Pokemon) -> Unit
 ) {
     pokemonPagingItems.apply {
 
@@ -191,7 +198,7 @@ fun HomePokemonList(
             }
 
             else -> {
-                PokemonList(pokemonPagingItems)
+                PokemonList(pokemonPagingItems, onSelect)
 
                 if (pokemonPagingItems.loadState.append is LoadState.Loading) {
                     if (viewModel.query.isEmpty()) {
@@ -207,7 +214,10 @@ fun HomePokemonList(
 }
 
 @Composable
-fun PokemonList(pokemonPagingItems: LazyPagingItems<Pokemon>) {
+fun PokemonList(
+    pokemonPagingItems: LazyPagingItems<Pokemon>,
+    onSelect: (Pokemon) -> Unit,
+) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 128.dp),
         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
@@ -221,17 +231,20 @@ fun PokemonList(pokemonPagingItems: LazyPagingItems<Pokemon>) {
             }
         ) { index ->
             pokemonPagingItems[index]?.let { pokemon ->
-                PokemonItem(pokemon)
+                PokemonItem(pokemon, onSelect)
             }
         }
     }
 }
 
 @Composable
-fun PokemonItem(pokemon: Pokemon) {
+fun PokemonItem(
+    pokemon: Pokemon,
+    onSelect: (Pokemon) -> Unit,
+) {
     Card(
         onClick = {
-
+            onSelect(pokemon)
         },
         colors = CardDefaults
             .cardColors(

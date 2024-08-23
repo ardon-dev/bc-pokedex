@@ -31,6 +31,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ardondev.bc_pokedex.R
+import com.ardondev.bc_pokedex.presentation.screens.detail.DetailScreen
 import com.ardondev.bc_pokedex.presentation.screens.home.HomeScreen
 import com.ardondev.bc_pokedex.presentation.theme.BCPokedexTheme
 import com.ardondev.bc_pokedex.presentation.theme.Typography
@@ -66,7 +67,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainNavigation(
     navHostController: NavHostController,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
 ) {
     NavHost(
         navController = navHostController,
@@ -76,7 +77,12 @@ fun MainNavigation(
 
         //Home screen
         composable(Routes.HomeScreen.route) {
-            HomeScreen()
+            HomeScreen(navController = navHostController)
+        }
+
+        //Detail screen
+        composable(Routes.DetailScreen.route) {
+            DetailScreen()
         }
 
     }
