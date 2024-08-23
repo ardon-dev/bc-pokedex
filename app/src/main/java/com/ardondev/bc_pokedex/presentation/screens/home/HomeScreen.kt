@@ -2,6 +2,7 @@
 
 package com.ardondev.bc_pokedex.presentation.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
@@ -26,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.capitalize
@@ -41,6 +44,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.ardondev.bc_pokedex.R
 import com.ardondev.bc_pokedex.domain.model.pokemon.Pokemon
+import com.ardondev.bc_pokedex.presentation.components.ErrorView
 import com.ardondev.bc_pokedex.presentation.components.LoadingView
 import com.ardondev.bc_pokedex.presentation.theme.Typography
 import com.ardondev.bc_pokedex.presentation.theme.navy
@@ -55,8 +59,12 @@ fun HomeScreen(
 
     Column(Modifier.fillMaxSize()) {
         HomeHeader(viewModel)
-        Spacer(Modifier.size(16.dp))
-        HomePokemonList(pokemonPagingItems)
+        HomePokemonList(
+            pokemonPagingItems = pokemonPagingItems,
+            onRetry = {
+                viewModel.getPokemonList()
+            }
+        )
     }
 
 }
@@ -115,7 +123,10 @@ fun HomeSearchBar(
 }
 
 @Composable
-fun HomePokemonList(pokemonPagingItems: LazyPagingItems<Pokemon>) {
+fun HomePokemonList(
+    pokemonPagingItems: LazyPagingItems<Pokemon>,
+    onRetry: () -> Unit
+) {
     pokemonPagingItems.apply {
         when {
             loadState.refresh is LoadState.Loading && pokemonPagingItems.itemCount == 0 -> {
@@ -123,12 +134,15 @@ fun HomePokemonList(pokemonPagingItems: LazyPagingItems<Pokemon>) {
             }
 
             loadState.refresh is LoadState.NotLoading && pokemonPagingItems.itemCount == 0 -> {
-                val error = pokemonPagingItems.loadState.refresh as LoadState.Error
-                Text(text = error.error.localizedMessage)
+                Text("Vacío")
             }
 
             loadState.hasError -> {
-                Text("Error")
+                val error = pokemonPagingItems.loadState.refresh as LoadState.Error
+                ErrorView(
+                    message = error.error.message.orEmpty(),
+                    onClick = onRetry
+                )
             }
 
             else -> {
@@ -146,9 +160,9 @@ fun HomePokemonList(pokemonPagingItems: LazyPagingItems<Pokemon>) {
 fun PokemonList(pokemonPagingItems: LazyPagingItems<Pokemon>) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 128.dp),
-        contentPadding = PaddingValues(horizontal = 24.dp),
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(
             count = pokemonPagingItems.itemCount,
@@ -168,9 +182,18 @@ fun PokemonItem(pokemon: Pokemon) {
     Card(
         onClick = {
 
-        }, colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
+        },
+        colors = CardDefaults
+            .cardColors(
+                containerColor = Color.White
+            ),
+        modifier = Modifier
+            .shadow(
+                elevation = 0.1.dp,
+                shape = MaterialTheme.shapes.medium,
+                ambientColor = MaterialTheme.colorScheme.primary,
+                spotColor = MaterialTheme.colorScheme.primary
+            )
     ) {
         Column(
             Modifier

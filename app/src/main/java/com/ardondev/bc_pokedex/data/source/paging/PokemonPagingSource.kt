@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.ardondev.bc_pokedex.data.source.remote.ApiService
 import com.ardondev.bc_pokedex.data.source.remote.response.pokemon.toModel
+import com.ardondev.bc_pokedex.domain.model.error.traceErrorException
 import com.ardondev.bc_pokedex.domain.model.pokemon.Pokemon
 import retrofit2.HttpException
 import java.io.IOException
@@ -33,11 +34,11 @@ class PokemonPagingSource @Inject constructor(
                 LoadResult.Error(NullPointerException())
             }
         } catch (e: IOException) {
-            LoadResult.Error(e)
+            LoadResult.Error(traceErrorException(e))
         } catch (e: HttpException) {
-            LoadResult.Error(e)
+            LoadResult.Error(traceErrorException(e))
         } catch (e: Exception) {
-            LoadResult.Error(e)
+            LoadResult.Error(traceErrorException(e))
         }
     }
 

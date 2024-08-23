@@ -35,17 +35,19 @@ class HomeViewModel @Inject constructor(
     private val _pokemonListState = MutableStateFlow<PagingData<Pokemon>>(PagingData.empty())
     val pokemonListState: MutableStateFlow<PagingData<Pokemon>> = _pokemonListState
 
-    suspend fun getPokemonList() {
-        getPokemonListUseCase(0, 10)
-            .distinctUntilChanged()
-            .cachedIn(viewModelScope)
-            .collect {
-                _pokemonListState.value = it
-            }
+    fun getPokemonList() {
+        viewModelScope.launch {
+            getPokemonListUseCase(0, 10)
+                .distinctUntilChanged()
+                .cachedIn(viewModelScope)
+                .collect {
+                    _pokemonListState.value = it
+                }
+        }
     }
 
     init {
-        viewModelScope.launch { getPokemonList() }
+        getPokemonList()
     }
 
 }
