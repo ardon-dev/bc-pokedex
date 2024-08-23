@@ -9,7 +9,7 @@ plugins {
 }
 
 val properties = Properties().apply {
-    load(FileInputStream(File(rootProject.rootDir, "local.properties")))
+    load(FileInputStream(File(rootProject.rootDir, "app.properties")))
 }
 
 android {
