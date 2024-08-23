@@ -153,7 +153,7 @@ fun PokemonList(pokemonPagingItems: LazyPagingItems<Pokemon>) {
         items(
             count = pokemonPagingItems.itemCount,
             key = { index ->
-                pokemonPagingItems[index]!!.id!!
+                pokemonPagingItems[index]?.id ?: -1
             }
         ) { index ->
             pokemonPagingItems[index]?.let { pokemon ->
@@ -190,7 +190,8 @@ fun PokemonItem(pokemon: Pokemon) {
                 modifier = Modifier
                     .size(80.dp)
                     .align(Alignment.CenterHorizontally),
-                error = painterResource(R.drawable.ic_launcher_background)
+                error = painterResource(R.drawable.img_pokeball),
+                placeholder = painterResource(R.drawable.img_pokeball)
             )
             Text(
                 text = pokemon.name?.capitalize(Locale.current).orEmpty(),
