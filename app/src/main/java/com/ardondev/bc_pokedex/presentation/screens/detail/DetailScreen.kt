@@ -419,7 +419,7 @@ fun StatisticBar(
         Spacer(Modifier.size(8.dp))
 
         LaunchedEffect(Unit) {
-            progress = (value * 0.01).toFloat()
+            progress = (value / 255f) * 100
         }
 
         LinearProgressIndicator(
