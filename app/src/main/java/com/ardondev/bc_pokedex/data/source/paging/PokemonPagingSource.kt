@@ -17,13 +17,13 @@ class PokemonPagingSource @Inject constructor(
         return try {
             val currentPage = params.key ?: 0
             val pokemonListResponse = apiService.getPokemonList(
-                limit = 10,
+                limit = 1302,
                 offset = currentPage
             )
             val list = pokemonListResponse.results
             if (list != null) {
-                val prevKey = if (currentPage == 0) null else (currentPage - 10)
-                val nextKey = if (list.isEmpty()) null else (currentPage + 10)
+                val prevKey = if (currentPage == 0) null else (currentPage - 1302)
+                val nextKey = if (list.isEmpty()) null else (currentPage + 1302)
                 LoadResult.Page(
                     data = list.map { it.toModel() },
                     prevKey = prevKey,
@@ -42,10 +42,7 @@ class PokemonPagingSource @Inject constructor(
     }
 
     override fun getRefreshKey(state: PagingState<Int, Pokemon>): Int? {
-        return state.anchorPosition?.let { anchorPosition ->
-            val anchorPage = state.closestPageToPosition(anchorPosition)
-            anchorPage?.prevKey?.plus(10) ?: anchorPage?.nextKey?.minus(10)
-        }
+        return state.anchorPosition
     }
 
 }

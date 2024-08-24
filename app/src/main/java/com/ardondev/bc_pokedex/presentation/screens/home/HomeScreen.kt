@@ -40,6 +40,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -291,7 +292,7 @@ fun PokemonItem(
                     .size(80.dp)
                     .align(Alignment.CenterHorizontally),
                 error = painterResource(R.drawable.ic_pokeball),
-                placeholder = painterResource(R.drawable.ic_pokeball)
+                placeholder = painterResource(R.drawable.ic_pokeball),
             )
             Text(
                 text = pokemon.name?.capitalize(Locale.current).orEmpty(),
@@ -299,6 +300,8 @@ fun PokemonItem(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = navy,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .padding(top = 16.dp)
                     .fillMaxWidth()
