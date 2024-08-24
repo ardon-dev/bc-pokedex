@@ -28,6 +28,7 @@ moshi = "1.15.1"
 material = "1.12.0"
 paging = "3.3.2"
 coil = "2.7.0"
+constraintlayout = "1.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -68,6 +69,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil"}
 coil-gif = { group = "io.coil-kt", name = "coil-gif", version.ref = "coil" }
+androidx-constraintlayout-compose = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintlayout"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

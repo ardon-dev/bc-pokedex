@@ -3,7 +3,6 @@ package com.ardondev.bc_pokedex.data.source.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.ardondev.bc_pokedex.data.source.remote.ApiService
-import com.ardondev.bc_pokedex.data.source.remote.response.pokemon.toModel
 import com.ardondev.bc_pokedex.domain.model.error.traceErrorException
 import com.ardondev.bc_pokedex.domain.model.pokemon.Pokemon
 import retrofit2.HttpException

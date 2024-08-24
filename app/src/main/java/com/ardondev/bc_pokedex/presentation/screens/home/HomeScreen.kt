@@ -24,6 +24,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -41,35 +42,54 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.ardondev.bc_pokedex.R
 import com.ardondev.bc_pokedex.domain.model.pokemon.Pokemon
+import com.ardondev.bc_pokedex.presentation.HomeTopAppBar
+import com.ardondev.bc_pokedex.presentation.MainTopBar
 import com.ardondev.bc_pokedex.presentation.components.ErrorView
 import com.ardondev.bc_pokedex.presentation.components.LoadingView
 import com.ardondev.bc_pokedex.presentation.components.SearchLoadingView
 import com.ardondev.bc_pokedex.presentation.theme.Typography
 import com.ardondev.bc_pokedex.presentation.theme.navy
 import com.ardondev.bc_pokedex.presentation.theme.yellow
+import com.ardondev.bc_pokedex.presentation.util.Routes
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
+    navController: NavController,
 ) {
 
     val pokemonPagingItems = viewModel.pokemonListState.collectAsLazyPagingItems()
 
-    Column(Modifier.fillMaxSize()) {
-        HomeHeader(viewModel)
-        HomePokemonList(
-            viewModel = viewModel,
-            pokemonPagingItems = pokemonPagingItems,
-            onRetry = {
-                viewModel.getPokemonList()
-            }
-        )
+    Scaffold(
+        topBar = { HomeTopAppBar() }
+    ) { innerPadding ->
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            HomeHeader(viewModel)
+            HomePokemonList(
+                viewModel = viewModel,
+                pokemonPagingItems = pokemonPagingItems,
+                onRetry = {
+                    viewModel.getPokemonList()
+                },
+                onSelect = { pokemon ->
+                    navController.navigate(Routes.DetailScreen.createRoute(
+                        pokemonId = pokemon.id ?: -1,
+                        pokemonName = pokemon.name ?: ""
+                    ))
+                }
+            )
+        }
     }
 
 }
@@ -142,6 +162,7 @@ fun HomePokemonList(
     viewModel: HomeViewModel,
     pokemonPagingItems: LazyPagingItems<Pokemon>,
     onRetry: () -> Unit,
+    onSelect: (Pokemon) -> Unit,
 ) {
     pokemonPagingItems.apply {
 
@@ -191,7 +212,7 @@ fun HomePokemonList(
             }
 
             else -> {
-                PokemonList(pokemonPagingItems)
+                PokemonList(pokemonPagingItems, onSelect)
 
                 if (pokemonPagingItems.loadState.append is LoadState.Loading) {
                     if (viewModel.query.isEmpty()) {
@@ -207,7 +228,10 @@ fun HomePokemonList(
 }
 
 @Composable
-fun PokemonList(pokemonPagingItems: LazyPagingItems<Pokemon>) {
+fun PokemonList(
+    pokemonPagingItems: LazyPagingItems<Pokemon>,
+    onSelect: (Pokemon) -> Unit,
+) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 128.dp),
         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
@@ -221,17 +245,20 @@ fun PokemonList(pokemonPagingItems: LazyPagingItems<Pokemon>) {
             }
         ) { index ->
             pokemonPagingItems[index]?.let { pokemon ->
-                PokemonItem(pokemon)
+                PokemonItem(pokemon, onSelect)
             }
         }
     }
 }
 
 @Composable
-fun PokemonItem(pokemon: Pokemon) {
+fun PokemonItem(
+    pokemon: Pokemon,
+    onSelect: (Pokemon) -> Unit,
+) {
     Card(
         onClick = {
-
+            onSelect(pokemon)
         },
         colors = CardDefaults
             .cardColors(
