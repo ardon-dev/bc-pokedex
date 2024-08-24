@@ -24,6 +24,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -48,6 +49,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.ardondev.bc_pokedex.R
 import com.ardondev.bc_pokedex.domain.model.pokemon.Pokemon
+import com.ardondev.bc_pokedex.presentation.HomeTopAppBar
+import com.ardondev.bc_pokedex.presentation.MainTopBar
 import com.ardondev.bc_pokedex.presentation.components.ErrorView
 import com.ardondev.bc_pokedex.presentation.components.LoadingView
 import com.ardondev.bc_pokedex.presentation.components.SearchLoadingView
@@ -64,18 +67,29 @@ fun HomeScreen(
 
     val pokemonPagingItems = viewModel.pokemonListState.collectAsLazyPagingItems()
 
-    Column(Modifier.fillMaxSize()) {
-        HomeHeader(viewModel)
-        HomePokemonList(
-            viewModel = viewModel,
-            pokemonPagingItems = pokemonPagingItems,
-            onRetry = {
-                viewModel.getPokemonList()
-            },
-            onSelect = { pokemon ->
-                navController.navigate(Routes.DetailScreen.createRoute(pokemon.id ?: -1))
-            }
-        )
+    Scaffold(
+        topBar = { HomeTopAppBar() }
+    ) { innerPadding ->
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            HomeHeader(viewModel)
+            HomePokemonList(
+                viewModel = viewModel,
+                pokemonPagingItems = pokemonPagingItems,
+                onRetry = {
+                    viewModel.getPokemonList()
+                },
+                onSelect = { pokemon ->
+                    navController.navigate(Routes.DetailScreen.createRoute(
+                        pokemonId = pokemon.id ?: -1,
+                        pokemonName = pokemon.name ?: ""
+                    ))
+                }
+            )
+        }
     }
 
 }

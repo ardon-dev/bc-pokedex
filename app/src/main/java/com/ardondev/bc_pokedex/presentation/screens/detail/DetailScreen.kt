@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -29,6 +28,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -39,19 +39,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.ardondev.bc_pokedex.R
 import com.ardondev.bc_pokedex.domain.model.pokemon.Pokemon
 import com.ardondev.bc_pokedex.domain.model.pokemon.Stat
 import com.ardondev.bc_pokedex.domain.model.pokemon.Type
+import com.ardondev.bc_pokedex.presentation.NavigationTopBar
 import com.ardondev.bc_pokedex.presentation.components.ErrorView
 import com.ardondev.bc_pokedex.presentation.components.LoadingView
 import com.ardondev.bc_pokedex.presentation.theme.blue
@@ -64,19 +64,49 @@ import com.ardondev.bc_pokedex.presentation.util.getSprite
 @Composable
 fun DetailScreen(
     viewModel: DetailViewModel = hiltViewModel(),
+    navController: NavController,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    when (uiState) {
-        is UiState.Loading -> LoadingView()
-        is UiState.Success -> {
-            val pokemon = (uiState as UiState.Success).data
-            DetailContent(pokemon)
-        }
 
-        is UiState.Error -> {
-            val error = (uiState as UiState.Error).exception.message
-            ErrorView(error.orEmpty()) {
-                viewModel.getPokemonDetail()
+    val uiState by viewModel.uiState.collectAsState()
+
+    Scaffold(
+        topBar = {
+            NavigationTopBar(
+                title = viewModel.pokemonName,
+                onBack = {
+                    navController.navigateUp()
+                },
+                actions = {
+                    Text(
+                        text = "#${viewModel.pokemonId}",
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color(0xFFAAAAAA),
+                        modifier = Modifier
+                            .padding(end = 24.dp)
+                    )
+                }
+            )
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            when (uiState) {
+                is UiState.Loading -> LoadingView()
+                is UiState.Success -> {
+                    val pokemon = (uiState as UiState.Success).data
+                    DetailContent(pokemon)
+                }
+
+                is UiState.Error -> {
+                    val error = (uiState as UiState.Error).exception.message
+                    ErrorView(error.orEmpty()) {
+                        viewModel.getPokemonDetail()
+                    }
+                }
             }
         }
     }
@@ -131,7 +161,7 @@ fun DetailContent(
 fun DetailHead(
     pokemonId: Int,
     primaryTypeId: Int,
-    types: List<Type>
+    types: List<Type>,
 ) {
     ConstraintLayout(
         modifier = Modifier

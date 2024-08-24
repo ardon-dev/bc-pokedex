@@ -9,27 +9,39 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.ardondev.bc_pokedex.R
@@ -37,6 +49,7 @@ import com.ardondev.bc_pokedex.presentation.screens.detail.DetailScreen
 import com.ardondev.bc_pokedex.presentation.screens.home.HomeScreen
 import com.ardondev.bc_pokedex.presentation.theme.BCPokedexTheme
 import com.ardondev.bc_pokedex.presentation.theme.Typography
+import com.ardondev.bc_pokedex.presentation.theme.navy
 import com.ardondev.bc_pokedex.presentation.theme.surface
 import com.ardondev.bc_pokedex.presentation.util.Routes
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,12 +67,7 @@ class MainActivity : ComponentActivity() {
             val navHostController = rememberNavController()
 
             BCPokedexTheme {
-                Scaffold(
-                    topBar = { MainTopBar() },
-                    modifier = Modifier.fillMaxSize()
-                ) { innerPadding ->
-                    MainNavigation(navHostController, innerPadding)
-                }
+                MainNavigation(navHostController)
             }
 
         }
@@ -68,13 +76,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainNavigation(
-    navHostController: NavHostController,
-    innerPadding: PaddingValues,
+    navHostController: NavHostController
 ) {
     NavHost(
         navController = navHostController,
-        startDestination = Routes.HomeScreen.route,
-        modifier = Modifier.padding(innerPadding)
+        startDestination = Routes.HomeScreen.route
     ) {
 
         //Home screen
@@ -88,32 +94,82 @@ fun MainNavigation(
             arguments = listOf(
                 navArgument("pokemon_id") {
                     type = NavType.IntType
+                },
+                navArgument("pokemon_name") {
+                    type = NavType.StringType
                 }
             )
         ) {
-            DetailScreen()
+            DetailScreen(navController = navHostController)
         }
 
     }
 }
 
 @Composable
-fun MainTopBar() {
+fun MainTopBar(
+    navHostController: NavHostController
+) {
+    val navBackStackEntry by navHostController.currentBackStackEntryAsState()
+    val isInHome = navBackStackEntry?.destination?.route == Routes.HomeScreen.route
+    if (isInHome) {
+        HomeTopAppBar()
+    }
+}
+
+@Composable
+fun NavigationTopBar(
+    title: String,
+    onBack: () -> Unit,
+    actions: @Composable RowScope.() -> Unit = {}
+) {
     TopAppBar(
         title = {
-            Row(
-                horizontalArrangement = Arrangement.Center
+            Text(
+                text = title.capitalize(Locale.current),
+                fontWeight = FontWeight.Bold,
+                color = navy
+            )
+        },
+        navigationIcon = {
+            IconButton(
+                onClick = onBack
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_pokeball),
-                    contentDescription = null
+                Icon(
+                    imageVector = Icons.Rounded.ArrowBack,
+                    contentDescription = "Regresar",
+                    tint = navy
                 )
-                Spacer(Modifier.size(8.dp))
-                Text(
-                    text = "Pokédex",
-                    style = Typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = surface
+        ),
+        actions = actions
+    )
+}
+
+@Composable
+fun HomeTopAppBar() {
+    TopAppBar(
+        title = {
+            Text(
+                text = "Pokédex",
+                style = Typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        navigationIcon = {
+            Box(
+                modifier =
+                Modifier
+                    .padding(start = 16.dp, end = 8.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_pokeball),
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp)
                 )
             }
         },

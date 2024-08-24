@@ -25,7 +25,7 @@ fun getColorByType(id: Int, soft: Boolean = false): Color {
         TYPE_ICE -> if (soft) Color(0xFFeaf7f7) else Color(0xFF96D9D6)
         TYPE_DRAGON -> if (soft) Color(0xFFe2d7fe) else Color(0xFF6F35FC)
         TYPE_DARK -> if (soft) Color(0xFFe6ddd7) else Color(0xFF705746)
-        TYPE_FAIRY -> if (!soft) Color(0xFFf7e7ef) else Color(0xFFD685AD)
+        TYPE_FAIRY -> if (soft) Color(0xFFf7e7ef) else Color(0xFFD685AD)
         TYPE_STELLAR-> Color(0xFFA8A77A)
         else -> Color(0xFFA8A77A)
     }
