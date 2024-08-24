@@ -2,10 +2,9 @@
 
 package com.ardondev.bc_pokedex.presentation.screens.detail
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,12 +19,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,30 +39,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.ardondev.bc_pokedex.R
 import com.ardondev.bc_pokedex.domain.model.pokemon.Pokemon
 import com.ardondev.bc_pokedex.domain.model.pokemon.Stat
+import com.ardondev.bc_pokedex.domain.model.pokemon.Type
 import com.ardondev.bc_pokedex.presentation.components.ErrorView
 import com.ardondev.bc_pokedex.presentation.components.LoadingView
 import com.ardondev.bc_pokedex.presentation.theme.blue
 import com.ardondev.bc_pokedex.presentation.theme.navy
 import com.ardondev.bc_pokedex.presentation.util.UiState
+import com.ardondev.bc_pokedex.presentation.util.getColorByType
+import com.ardondev.bc_pokedex.presentation.util.getNameByType
 import com.ardondev.bc_pokedex.presentation.util.getSprite
 
 @Composable
 fun DetailScreen(
     viewModel: DetailViewModel = hiltViewModel(),
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
     when (uiState) {
         is UiState.Loading -> LoadingView()
@@ -69,7 +72,8 @@ fun DetailScreen(
             val pokemon = (uiState as UiState.Success).data
             DetailContent(pokemon)
         }
-        is UiState.Error ->  {
+
+        is UiState.Error -> {
             val error = (uiState as UiState.Error).exception.message
             ErrorView(error.orEmpty()) {
                 viewModel.getPokemonDetail()
@@ -87,7 +91,7 @@ fun DetailContentPreview() {
 
 @Composable
 fun DetailContent(
-    pokemon: Pokemon
+    pokemon: Pokemon,
 ) {
 
     val scrollState = rememberScrollState()
@@ -101,7 +105,13 @@ fun DetailContent(
                 horizontal = 24.dp
             )
     ) {
-        DetailHead(pokemon)
+        val primaryTypeId = pokemon.types?.getOrNull(0)?.id ?: 0
+
+        DetailHead(
+            pokemonId = pokemon.id ?: -1,
+            primaryTypeId = primaryTypeId,
+            types = pokemon.types.orEmpty()
+        )
         Spacer(Modifier.size(16.dp))
         DetailPokemonProperties(
             weight = pokemon.weight ?: 0,
@@ -110,13 +120,18 @@ fun DetailContent(
         Spacer(Modifier.size(16.dp))
         DetailDescription()
         Spacer(Modifier.size(16.dp))
-        DetailStatistics(pokemon.stats.orEmpty())
+        DetailStatistics(
+            stats = pokemon.stats.orEmpty(),
+            typeId = primaryTypeId
+        )
     }
 }
 
 @Composable
 fun DetailHead(
-    pokemon: Pokemon
+    pokemonId: Int,
+    primaryTypeId: Int,
+    types: List<Type>
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -128,7 +143,7 @@ fun DetailHead(
         Box(
             modifier = Modifier
                 .background(
-                    color = Color.Magenta,
+                    color = getColorByType(primaryTypeId, true),
                     shape = MaterialTheme.shapes.large
                 )
                 .fillMaxWidth()
@@ -141,7 +156,7 @@ fun DetailHead(
         )
 
         AsyncImage(
-            model = getSprite(pokemon.id!!),
+            model = getSprite(pokemonId),
             contentDescription = null,
             error = painterResource(R.drawable.ic_pokeball),
             placeholder = painterResource(R.drawable.ic_pokeball),
@@ -154,25 +169,64 @@ fun DetailHead(
                 },
         )
 
-        FilterChip(
-            selected = false,
-            onClick = { },
-            label = { Text(text = "Type") },
+        //Types
+        Log.d("DetailScreen", types.toString())
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
             modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
                 .constrainAs(type) {
                     top.linkTo(sprite.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-        )
+        ) {
+            types.forEach { pokemonType ->
+                if (types.size > 1 && types.indexOf(pokemonType) == 1) {
+                    Spacer(Modifier.size(8.dp))
+                }
+                PokemonType(
+                    pokemonType = pokemonType,
+                    modifier = Modifier
+                )
+            }
+        }
 
     }
+
+}
+
+@Composable
+fun PokemonType(
+    modifier: Modifier,
+    pokemonType: Type,
+) {
+    FilterChip(
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = FilterChipDefaults.filterChipColors(
+            containerColor = getColorByType(pokemonType.id!!, true),
+            labelColor = getColorByType(pokemonType.id),
+        ),
+        border = FilterChipDefaults.filterChipBorder(
+            borderColor = getColorByType(pokemonType.id)
+        ),
+        selected = false,
+        onClick = { },
+        label = {
+            Text(
+                text = getNameByType(pokemonType.id)
+            )
+        },
+        modifier = modifier
+    )
 }
 
 @Composable
 fun DetailPokemonProperties(
     weight: Int,
-    height: Int
+    height: Int,
 ) {
     Card(
         colors = CardDefaults.cardColors(
@@ -255,7 +309,8 @@ fun DetailDescription() {
 
 @Composable
 fun DetailStatistics(
-    stats: List<Stat>
+    stats: List<Stat>,
+    typeId: Int,
 ) {
     Column(
         modifier = Modifier
@@ -278,7 +333,11 @@ fun DetailStatistics(
                 5 -> "Defensa especial"
                 else -> "Velocidad"
             }
-            StatisticBar(label = name, value = it.base!!)
+            StatisticBar(
+                label = name,
+                value = it.base!!,
+                type = typeId
+            )
         }
     }
 }
@@ -287,6 +346,7 @@ fun DetailStatistics(
 fun StatisticBar(
     label: String,
     value: Int,
+    type: Int,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -307,18 +367,22 @@ fun StatisticBar(
         //Bar
         LinearProgressIndicator(
             progress = (value * 0.01).toFloat(),
+            color = getColorByType(type),
+            trackColor = getColorByType(type, true),
             strokeCap = StrokeCap.Round,
             modifier = Modifier
                 .height(14.dp)
                 .weight(1.5f)
         )
-        Spacer(Modifier.size(8.dp))
         //Value
         Text(
             text = value.toString(),
             style = MaterialTheme.typography.labelLarge,
+            textAlign = TextAlign.End,
             fontWeight = FontWeight.ExtraBold,
             color = Color(0xFF404040),
+            modifier = Modifier
+                .weight(0.3f)
         )
     }
 }
