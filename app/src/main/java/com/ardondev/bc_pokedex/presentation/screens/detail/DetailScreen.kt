@@ -63,6 +63,7 @@ import com.ardondev.bc_pokedex.presentation.components.LoadingView
 import com.ardondev.bc_pokedex.presentation.theme.blue
 import com.ardondev.bc_pokedex.presentation.theme.navy
 import com.ardondev.bc_pokedex.presentation.util.UiState
+import com.ardondev.bc_pokedex.presentation.util.formatPokemonId
 import com.ardondev.bc_pokedex.presentation.util.getColorByType
 import com.ardondev.bc_pokedex.presentation.util.getNameByType
 import com.ardondev.bc_pokedex.presentation.util.getSprite
@@ -86,7 +87,7 @@ fun DetailScreen(
                 },
                 actions = {
                     Text(
-                        text = "#${viewModel.pokemonId}",
+                        text = formatPokemonId(viewModel.pokemonId),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.titleLarge,
                         color = Color(0xFFAAAAAA),
@@ -200,8 +201,6 @@ fun DetailHead(
         AsyncImage(
             model = getSprite(pokemonId),
             contentDescription = null,
-            error = painterResource(R.drawable.ic_pokeball),
-            placeholder = painterResource(R.drawable.ic_pokeball),
             modifier = Modifier
                 .size(200.dp)
                 .constrainAs(sprite) {

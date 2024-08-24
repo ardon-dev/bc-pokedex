@@ -2,7 +2,6 @@
 
 package com.ardondev.bc_pokedex.presentation.screens.home
 
-import android.widget.Space
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,9 +37,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -48,7 +44,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -62,11 +57,12 @@ import com.ardondev.bc_pokedex.presentation.HomeTopAppBar
 import com.ardondev.bc_pokedex.presentation.components.ErrorView
 import com.ardondev.bc_pokedex.presentation.components.LoadingView
 import com.ardondev.bc_pokedex.presentation.components.SearchLoadingView
-import com.ardondev.bc_pokedex.presentation.theme.Typography
 import com.ardondev.bc_pokedex.presentation.theme.navy
 import com.ardondev.bc_pokedex.presentation.theme.surface
 import com.ardondev.bc_pokedex.presentation.theme.yellow
 import com.ardondev.bc_pokedex.presentation.util.Routes
+import com.ardondev.bc_pokedex.presentation.util.formatPokemonId
+import com.ardondev.bc_pokedex.presentation.util.getWelcomeText
 
 @Composable
 fun HomeScreen(
@@ -121,17 +117,6 @@ fun HomeHeader(
         )
         Spacer(Modifier.size(16.dp))
         HomeSearchBar(viewModel)
-    }
-}
-
-private fun getWelcomeText(): AnnotatedString {
-    return buildAnnotatedString {
-        withStyle(SpanStyle(fontWeight = FontWeight.Normal)) {
-            append("¡Hola, ")
-        }
-        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-            append("bienvenido!")
-        }
     }
 }
 
@@ -315,7 +300,7 @@ fun PokemonItem(
                 .padding(16.dp)
         ) {
             Text(
-                text = "#${pokemon.id}",
+                text = formatPokemonId(pokemon.id ?: 0),
                 textAlign = TextAlign.End,
                 style = MaterialTheme.typography.labelMedium,
                 color = Color(0xFFAAAAAA),

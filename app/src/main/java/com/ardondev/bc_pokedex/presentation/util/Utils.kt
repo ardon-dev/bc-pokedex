@@ -1,6 +1,11 @@
 package com.ardondev.bc_pokedex.presentation.util
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 
 fun getSprite(id: Int): String {
     return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/$id.png"
@@ -53,5 +58,27 @@ fun getNameByType(id: Int): String {
         TYPE_FAIRY -> "✨ Ada"
         TYPE_STELLAR-> "Estelar"
         else -> id.toString()
+    }
+}
+
+fun getWelcomeText(): AnnotatedString {
+    return buildAnnotatedString {
+        withStyle(SpanStyle(fontWeight = FontWeight.Normal)) {
+            append("¡Hola, ")
+        }
+        withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) {
+            append("bienvenido")
+        }
+        withStyle(SpanStyle(fontWeight = FontWeight.Normal)) {
+            append("!")
+        }
+    }
+}
+
+fun formatPokemonId(id: Int): String {
+    return if (id >= 1000) {
+        "#$id"
+    } else {
+        "#${id.toString().padStart(3, '0')}"
     }
 }
