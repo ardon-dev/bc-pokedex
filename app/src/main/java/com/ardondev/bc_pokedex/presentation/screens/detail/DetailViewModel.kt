@@ -37,6 +37,7 @@ class DetailViewModel @Inject constructor(
 
     fun getPokemonDetail() {
         viewModelScope.launch {
+            _uiState.value = UiState.Loading
             val result = getPokemonDetailUseCase(pokemonId)
             if (result.isSuccess) {
                 getPokemonTextEntry()
