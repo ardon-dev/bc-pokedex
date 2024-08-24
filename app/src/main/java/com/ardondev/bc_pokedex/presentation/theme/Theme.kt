@@ -1,16 +1,13 @@
 package com.ardondev.bc_pokedex.presentation.theme
 
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
+import android.app.Activity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowInsetsControllerCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = blue,
@@ -36,9 +33,20 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun BCPokedexTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
+    darkTheme: Boolean = false,
+    content: @Composable () -> Unit,
 ) {
+    val context = LocalContext.current
+    val window = (context as? Activity)?.window
+    val view = LocalView.current
+
+    if (!view.isInEditMode) {
+        window?.let {
+            val windowInsetsController = WindowInsetsControllerCompat(window, view)
+            windowInsetsController.isAppearanceLightStatusBars = !darkTheme
+        }
+    }
+
     val colorScheme = when {
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
