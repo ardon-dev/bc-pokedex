@@ -34,6 +34,7 @@ android {
             buildConfigField("String", "BASE_URL", properties.getProperty("api.url"))
         }
         release {
+            signingConfig = signingConfigs["debug"]
             buildConfigField("String", "BASE_URL", properties.getProperty("api.url"))
             isMinifyEnabled = false
             proguardFiles(
@@ -79,6 +80,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.constraintlayout.compose)
+    implementation(libs.gigamole.composefadingedges)
 
     //Test
     testImplementation(libs.junit)

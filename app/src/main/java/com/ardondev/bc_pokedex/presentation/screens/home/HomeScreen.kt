@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -63,6 +64,9 @@ import com.ardondev.bc_pokedex.presentation.theme.yellow
 import com.ardondev.bc_pokedex.presentation.util.Routes
 import com.ardondev.bc_pokedex.presentation.util.formatPokemonId
 import com.ardondev.bc_pokedex.presentation.util.getWelcomeText
+import com.gigamole.composefadingedges.FadingEdgesGravity
+import com.gigamole.composefadingedges.fill.FadingEdgesFillType
+import com.gigamole.composefadingedges.verticalFadingEdges
 
 @Composable
 fun HomeScreen(
@@ -81,6 +85,7 @@ fun HomeScreen(
                 .padding(innerPadding)
         ) {
             HomeHeader(viewModel)
+            Spacer(Modifier.size(8.dp))
             HomePokemonList(
                 viewModel = viewModel,
                 pokemonPagingItems = pokemonPagingItems,
@@ -254,11 +259,22 @@ fun PokemonList(
     pokemonPagingItems: LazyPagingItems<Pokemon>,
     onSelect: (Pokemon) -> Unit,
 ) {
+    val gridState = rememberLazyGridState()
+
     LazyVerticalGrid(
+        state = gridState,
         columns = GridCells.Adaptive(minSize = 128.dp),
         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier
+            .verticalFadingEdges(
+                gravity = FadingEdgesGravity.All,
+                length = 36.dp,
+                fillType = FadingEdgesFillType.FadeColor(
+                    color = surface
+                )
+            ),
     ) {
         items(
             count = pokemonPagingItems.itemCount,
@@ -266,8 +282,12 @@ fun PokemonList(
                 pokemonPagingItems[index]?.id ?: -1
             }
         ) { index ->
+
             pokemonPagingItems[index]?.let { pokemon ->
-                PokemonItem(pokemon, onSelect)
+                PokemonItem(
+                    pokemon = pokemon,
+                    onSelect = onSelect
+                )
             }
         }
     }

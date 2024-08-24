@@ -31,7 +31,7 @@ fun getColorByType(id: Int, soft: Boolean = false): Color {
         TYPE_DRAGON -> if (soft) Color(0xFFe2d7fe) else Color(0xFF6F35FC)
         TYPE_DARK -> if (soft) Color(0xFFe6ddd7) else Color(0xFF705746)
         TYPE_FAIRY -> if (soft) Color(0xFFf7e7ef) else Color(0xFFD685AD)
-        TYPE_STELLAR-> Color(0xFFA8A77A)
+        TYPE_STELLAR -> Color(0xFFA8A77A)
         else -> Color(0xFFA8A77A)
     }
 }
@@ -56,7 +56,7 @@ fun getNameByType(id: Int): String {
         TYPE_DRAGON -> "\uD83D\uDC32 Dragón"
         TYPE_DARK -> "\uD83C\uDF11 Siniestro"
         TYPE_FAIRY -> "✨ Ada"
-        TYPE_STELLAR-> "Estelar"
+        TYPE_STELLAR -> "Estelar"
         else -> id.toString()
     }
 }
