@@ -1,10 +1,14 @@
 package com.ardondev.bc_pokedex.presentation.screens.detail
 
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ardondev.bc_pokedex.domain.model.pokemon.Pokemon
 import com.ardondev.bc_pokedex.domain.usecase.pokemon.GetPokemonDetailUseCase
+import com.ardondev.bc_pokedex.domain.usecase.pokemon.GetTextEntryUseCase
 import com.ardondev.bc_pokedex.presentation.util.UiState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -18,6 +22,7 @@ import javax.inject.Inject
 class DetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getPokemonDetailUseCase: GetPokemonDetailUseCase,
+    private val getTextEntryUseCase: GetTextEntryUseCase
 ) : ViewModel() {
 
     val pokemonName = savedStateHandle["pokemon_name"] ?: ""
@@ -34,6 +39,7 @@ class DetailViewModel @Inject constructor(
         viewModelScope.launch {
             val result = getPokemonDetailUseCase(pokemonId)
             if (result.isSuccess) {
+                getPokemonTextEntry()
                 result.getOrNull()?.let { data ->
                     _uiState.value = UiState.Success(data)
                 }
@@ -41,6 +47,24 @@ class DetailViewModel @Inject constructor(
                 result.exceptionOrNull()?.let { e ->
                     _uiState.value = UiState.Error(e)
                 }
+            }
+        }
+    }
+
+    /** Get pokemon text entry **/
+
+    private val _textEntry = MutableStateFlow("")
+    val textEntry: StateFlow<String> = _textEntry
+
+    fun getPokemonTextEntry() {
+        viewModelScope.launch {
+            val result = getTextEntryUseCase(pokemonId)
+            if (result.isSuccess) {
+                result.getOrNull()?.let { data ->
+                    _textEntry.value = data
+                }
+            } else {
+                Log.d("DetailViewModel", result.exceptionOrNull().toString())
             }
         }
     }

@@ -68,6 +68,7 @@ fun DetailScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
+    val textEntry by viewModel.textEntry.collectAsState()
 
     Scaffold(
         topBar = {
@@ -98,7 +99,10 @@ fun DetailScreen(
                 is UiState.Loading -> LoadingView()
                 is UiState.Success -> {
                     val pokemon = (uiState as UiState.Success).data
-                    DetailContent(pokemon)
+                    DetailContent(
+                        pokemon = pokemon,
+                        textEntry = textEntry
+                    )
                 }
 
                 is UiState.Error -> {
@@ -116,12 +120,13 @@ fun DetailScreen(
 @Composable
 fun DetailContentPreview() {
     val pokemon = Pokemon("a", "s", 5)
-    DetailContent(pokemon = pokemon)
+    DetailContent(pokemon = pokemon, "")
 }
 
 @Composable
 fun DetailContent(
     pokemon: Pokemon,
+    textEntry: String,
 ) {
 
     val scrollState = rememberScrollState()
@@ -148,7 +153,7 @@ fun DetailContent(
             height = pokemon.height ?: 0
         )
         Spacer(Modifier.size(16.dp))
-        DetailDescription()
+        DetailDescription(textEntry)
         Spacer(Modifier.size(16.dp))
         DetailStatistics(
             stats = pokemon.stats.orEmpty(),
@@ -327,9 +332,11 @@ fun DetailProperty(
 }
 
 @Composable
-fun DetailDescription() {
+fun DetailDescription(
+    text: String,
+) {
     Text(
-        text = "La figura de Charizard es la de un dragón erguido sobre sus dos patas traseras, que sostienen su peso. Posee unas poderosas alas y un abrasador aliento de fuego.",
+        text = text,
         style = MaterialTheme.typography.bodyMedium,
         color = Color(0xFF7C7C7C),
         modifier = Modifier
