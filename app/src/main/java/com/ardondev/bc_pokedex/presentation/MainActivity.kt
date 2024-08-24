@@ -49,6 +49,7 @@ import com.ardondev.bc_pokedex.presentation.screens.detail.DetailScreen
 import com.ardondev.bc_pokedex.presentation.screens.home.HomeScreen
 import com.ardondev.bc_pokedex.presentation.theme.BCPokedexTheme
 import com.ardondev.bc_pokedex.presentation.theme.Typography
+import com.ardondev.bc_pokedex.presentation.theme.blue
 import com.ardondev.bc_pokedex.presentation.theme.navy
 import com.ardondev.bc_pokedex.presentation.theme.surface
 import com.ardondev.bc_pokedex.presentation.util.Routes
@@ -155,7 +156,7 @@ fun HomeTopAppBar() {
         title = {
             Text(
                 text = "Pokédex",
-                style = Typography.titleLarge,
+                style = Typography.headlineSmall,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold
             )
@@ -169,6 +170,7 @@ fun HomeTopAppBar() {
                 Icon(
                     painter = painterResource(R.drawable.ic_pokeball),
                     contentDescription = null,
+                    tint = blue,
                     modifier = Modifier.size(40.dp)
                 )
             }

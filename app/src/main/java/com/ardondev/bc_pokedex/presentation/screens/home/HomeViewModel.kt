@@ -28,8 +28,12 @@ class HomeViewModel @Inject constructor(
     var query by mutableStateOf("")
         private set
 
+    var searchActive by mutableStateOf(false)
+        private set
+
     fun setQueryValue(value: String) {
         query = value
+        searchActive = value.isNotEmpty()
     }
 
     /** Pokemon list **/
