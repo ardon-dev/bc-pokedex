@@ -3,6 +3,7 @@
 package com.ardondev.bc_pokedex.presentation.screens.detail
 
 import android.util.Log
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,11 +29,16 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,6 +66,7 @@ import com.ardondev.bc_pokedex.presentation.util.UiState
 import com.ardondev.bc_pokedex.presentation.util.getColorByType
 import com.ardondev.bc_pokedex.presentation.util.getNameByType
 import com.ardondev.bc_pokedex.presentation.util.getSprite
+import kotlinx.coroutines.delay
 
 @Composable
 fun DetailScreen(
@@ -385,6 +392,16 @@ fun StatisticBar(
     value: Int,
     type: Int,
 ) {
+
+    var progress by rememberSaveable {
+        mutableStateOf(0f)
+    }
+
+    val animateProgress by animateFloatAsState(
+        targetValue = progress,
+        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
+    )
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -401,9 +418,13 @@ fun StatisticBar(
                 .weight(1f)
         )
         Spacer(Modifier.size(8.dp))
-        //Bar
+
+        LaunchedEffect(Unit) {
+            progress = (value * 0.01).toFloat()
+        }
+
         LinearProgressIndicator(
-            progress = (value * 0.01).toFloat(),
+            progress = animateProgress,
             color = getColorByType(type),
             trackColor = getColorByType(type, true),
             strokeCap = StrokeCap.Round,
