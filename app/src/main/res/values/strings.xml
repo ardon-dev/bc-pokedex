@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">BC Pokedex</string>
+    <string name="txt_no_results">¡No hay resultados!</string>
+    <string name="txt_retry">Reintentar</string>
+    <string name="txt_searching_coincidences">Buscando coincidencias, %1$s encontradas...</string>
+    <string name="txt_welcome">¡Hola, <b>bienvenido</b>!</string>
+    <string name="txt_weight">Peso</string>
+    <string name="txt_height">Altura</string>
+    <string name="txt_search">Buscar</string>
 </resources>
