@@ -397,7 +397,7 @@ fun StatisticBar(
     }
 
     val animateProgress by animateFloatAsState(
-        targetValue = progress,
+        targetValue = progress / 100,
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
     )
 
